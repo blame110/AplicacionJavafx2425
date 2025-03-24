@@ -1,4 +1,4 @@
-package unidad4.utils;
+package utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

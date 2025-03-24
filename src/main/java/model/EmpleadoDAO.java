@@ -1,4 +1,4 @@
-package unidad4.model;
+package model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -93,6 +93,45 @@ public class EmpleadoDAO {
 		}
 
 		return null;
+	}
+
+	/**
+	 * La función devuelve el empleado asociado al nombre que introducimos
+	 * @param con Conexion activa a la bd
+	 * @return un EmpleadoDO o null
+	 */
+	public static EmpleadoDO getEmpleadoDO(Connection con, String nombre) {
+
+		EmpleadoDO empleado = null;
+		;
+
+		try {
+
+			//Para evitar la inyeccion sql los parametros de la query los metemos con ?
+			//Y se los añadiremos despues de forma controlada utilizando preparedStatement
+			String query = "select * from empleados where nombre = ?";
+
+			PreparedStatement pstmt = con.prepareStatement(query);
+
+			//Asignamos el parametro id en la primera interrogacion ( y la unica)
+			pstmt.setString(1, nombre);
+
+			//Una vez asignados los valores ejecutamos la query
+			ResultSet rs = pstmt.executeQuery();
+
+			//Nos posicionamos en el primer elemento
+			rs.next();
+
+			//cargamos del resultset los datos en un empleadoDO
+			empleado = new EmpleadoDO(rs.getInt("idempleados"), rs.getString("nombre"), rs.getString("apellidos"),
+					rs.getInt("edad"), rs.getDouble("sueldo"), rs.getInt("puesto"));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return empleado;
 	}
 
 	/**
@@ -243,7 +282,7 @@ public class EmpleadoDAO {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return -1;
+			return -3;
 
 		}
 

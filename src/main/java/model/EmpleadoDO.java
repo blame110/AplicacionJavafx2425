@@ -1,4 +1,4 @@
-package unidad4.model;
+package model;
 
 public class EmpleadoDO {
 
