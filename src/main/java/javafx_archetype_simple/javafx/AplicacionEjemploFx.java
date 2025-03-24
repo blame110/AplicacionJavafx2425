@@ -18,7 +18,9 @@ public class AplicacionEjemploFx extends Application {
 		//Panel VBoxPrincipal
 		VBox panelPrincipal = new VBox();
 
+		//Creamos los paneles principales
 		PanelEmpleado pEmpleado = new PanelEmpleado();
+		PanelFTP pFtp = new PanelFTP();
 
 		//Panel con las pestañas (tabpane)
 		TabPane tabPes = new TabPane();
@@ -33,9 +35,13 @@ public class AplicacionEjemploFx extends Application {
 
 		//Ponemos el contenidos a las pestañas
 		empleadoTab.setContent(pEmpleado);
+		ftpTab.setContent(pFtp);
 
 		//Añadimos las pestañas al panel de pestañas
 		tabPes.getTabs().addAll(empleadoTab, ftpTab, chatTab);
+
+		//Ejemplo por defecto que se selecciona la pestaña ftp
+		tabPes.getSelectionModel().select(ftpTab);
 
 		//Ponemos el gridpane dentro del VBox
 		panelPrincipal.getChildren().add(tabPes);
