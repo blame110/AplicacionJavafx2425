@@ -21,6 +21,7 @@ public class AplicacionEjemploFx extends Application {
 		//Creamos los paneles principales
 		PanelEmpleado pEmpleado = new PanelEmpleado();
 		PanelFTP pFtp = new PanelFTP();
+		PanelChatBot pChat = new PanelChatBot();
 
 		//Panel con las pestañas (tabpane)
 		TabPane tabPes = new TabPane();
@@ -36,6 +37,7 @@ public class AplicacionEjemploFx extends Application {
 		//Ponemos el contenidos a las pestañas
 		empleadoTab.setContent(pEmpleado);
 		ftpTab.setContent(pFtp);
+		chatTab.setContent(pChat);
 
 		//Añadimos las pestañas al panel de pestañas
 		tabPes.getTabs().addAll(empleadoTab, ftpTab, chatTab);
