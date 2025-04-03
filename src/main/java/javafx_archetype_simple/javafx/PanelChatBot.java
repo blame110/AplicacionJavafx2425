@@ -1,5 +1,6 @@
 package javafx_archetype_simple.javafx;
 
+import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -7,6 +8,8 @@ import java.net.http.HttpResponse;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,7 +23,7 @@ import javafx.scene.text.Text;
 public class PanelChatBot extends GridPane {
 
 	//Constantes para la peticion a la api de openrouter - deepseek free
-	private final String API_KEY = "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";
+	private final String API_KEY = "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";
 	private final String API_URL = "https://openrouter.ai/api/v1/chat/completions";
 	private final String API_MODEL = "deepseek/deepseek-chat-v3-0324:free";
 
@@ -89,12 +92,13 @@ public class PanelChatBot extends GridPane {
 		JsonObject message = new JsonObject();
 		//añadimos las propiedades
 		message.addProperty("role", "user");
-		message.addProperty("content",
-				"Explicame el nacimiento del primer informatico de la historia en clave de humor");
+		message.addProperty("content", inputField.getText());
 		//Añadimos el message al array messages
 		messages.add(message);
 		//Añadimos al json principal el array con role y content como un elemento mas
 		jsonBody.add("messages", messages);
+
+		chatHistory.setText(chatHistory.getText() + "\n" + "Tu: " + inputField.getText());
 
 		/* Header structure
 		 * "Authorization": "Bearer <OPENROUTER_API_KEY>",
@@ -102,7 +106,7 @@ public class PanelChatBot extends GridPane {
 		 */
 		//Realizamos la solicitud post http
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(this.API_URL))
-				.header("Content-Type", "application/json").header("Authorization", "Bearer " + this.API_KEY)
+				.header("Authorization", "Bearer " + this.API_KEY).header("Content-Type", "application/json")
 				.POST(HttpRequest.BodyPublishers.ofString(jsonBody.toString())).build();
 
 		//Creamos un cliente para recoger la respuesta
@@ -110,8 +114,20 @@ public class PanelChatBot extends GridPane {
 
 		client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body)
 				.thenAccept(response -> {
+					//Creamos un objeto de tipo Jsonreader para leer la respuesta que nos llega como un json
+					JsonReader reader = new JsonReader(new StringReader(response));
+					reader.setLenient(true);
+					JsonObject responseJson = JsonParser.parseReader(reader).getAsJsonObject();
 
-					System.out.println("Respuesta:" + response);
+					//para conseguir el texto de respuesta de deepseek tenemos que 
+					//parsear el json, conseguir la posicion 1 del array choices
+					//y dentro de message el atributo content
+					String respuesta = responseJson.getAsJsonArray("choices").get(0).getAsJsonObject()
+							.getAsJsonObject("message").get("content").getAsString();
+
+					//Actualizamos el panel con la conversacion
+					//Cogemos el contenido actual le damos un enter y pegamos la respuesta de deepsek
+					chatHistory.setText(chatHistory.getText() + "\n" + "Deepseek dice: " + respuesta);
 
 				});
 
